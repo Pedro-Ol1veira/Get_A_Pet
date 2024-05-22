@@ -1,5 +1,6 @@
 const createUserToken = require('../helpers/create-user-token');
 const getToken = require('../helpers/get-token');
+const getUserByToken = require('../helpers/get-user-by-token');
 const User = require('../models/User');
 
 const bcrypt = require('bcrypt');
@@ -108,5 +109,72 @@ module.exports = class userController {
         }
 
         res.status(200).send(currentUser);
+    };
+
+    static async getUserById(req, res) {
+        const id = req.params.id;
+        const user = await User.findById(id).select("-password");
+        if(!user) {
+            res.status(422).json({
+                message: "Usuario não encontrado"
+            });
+            return;
+        };
+
+        res.status(200).json({ user });
+    };
+
+    static async editUser(req, res) {
+        const id = req.params.id;
+        const token = getToken(req);
+        const user = await getUserByToken(token);
+
+        const {name, email, phone, password, confirmPassword} = req.body;
+        let image = '';
+
+        if(!name) {
+            res.status(422).json({message: 'O nome é obrigatorio'});
+            return;
+        } else if (!email) {
+            res.status(422).json({message: 'O e-mail é obrigatorio'});
+            return;
+        } else if (!phone) {
+            res.status(422).json({message: 'O telefone é obrigatorio'});
+            return;
+        } else if (!password) {
+            res.status(422).json({message: 'A senha é obrigatoria'});
+            return;
+        } else if (!confirmPassword) {
+            res.status(422).json({message: 'A confirmação de senha é obrigatoria'});
+            return;
+        } else if(password !== confirmPassword) {
+            res.status(422).json({message: 'A senha e a confirmação de senha precisam ser iguais'});
+            return;
+        };
+
+        const userExists = await User.findOne({email: email});
+
+        if(user.email !== email && userExists) {
+            res.status(422).json({
+                message: "E-mail em uso, por favor utiliza outro"
+            });
+            return;
+        };
+
+        const salt = await bcrypt.genSalt(12);
+        const passwordHash = await bcrypt.hash(password, salt);
+
+        user.email = email;
+        user.name = name;
+        user.phone = phone;
+        user.password = passwordHash;
+
+        console.log(user);
+        
+
+        
+        
+        
+        
     };
 };
