@@ -12,7 +12,7 @@ const getUserByToken = async (token) => {
     const userId = decoded.id;
 
     const user = await User.findById(userId);
-
+    user.password = undefined;
     return user;
 };
 
