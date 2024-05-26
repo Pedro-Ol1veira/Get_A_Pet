@@ -10,5 +10,7 @@ router.get('/myadoptions', veriftToken, petController.getAllUserAdoptions);
 router.get('/:id', petController.getPetById);
 router.delete('/:id', veriftToken, petController.removePetById);
 router.patch('/:id', veriftToken, imageUpload.array('images'), petController.updatePet);
+router.patch('/schedule/:id', veriftToken,  petController.schedule);
+router.patch('/conclude/:id', veriftToken,  petController.concludeAdoption);
 
 module.exports = router;

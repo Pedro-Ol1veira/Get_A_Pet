@@ -1,6 +1,7 @@
 const Pet = require('../models/Pet');
 const getToken = require('../helpers/get-token');
 const getUserByToken = require('../helpers/get-user-by-token');
+const checkPetOwner = require('../helpers/check-pet-owner');
 const ObjectId = require('mongoose').Types.ObjectId;
 
 module.exports = class petController {
@@ -120,23 +121,9 @@ module.exports = class petController {
     static async removePetById(req, res) {
         const id = req.params.id;
 
-        if(!ObjectId.isValid(id)) {
-            res.status(422).json({message: "Id inválido"});
-            return;
-        };
-
-        const pet = await Pet.findOne({_id: id});
+        const pet = await checkPetOwner(req, res, id);
 
         if(!pet) {
-            res.status(404).json({message: "Pet não encontrado"});
-            return;
-        };
-
-        const token = getToken(req);
-        const user = await getUserByToken(token);
-
-        if(pet.user.id.toString() !== user.id) {
-            res.status(422).json({message: "Houve um problema em processar a sua solicitação, tente novament mais tarde"});
             return;
         };
 
@@ -156,24 +143,9 @@ module.exports = class petController {
 
         const updatedData = {};
 
-        if(!ObjectId.isValid(id)) {
-            res.status(422).json({message: "Id inválido"});
-            return;
-        };
-
-        //passar isso para um helper
-        const token = getToken(req);
-        const user = await getUserByToken(token);
-
-        const pet = await Pet.findOne({_id: id});
-
+        const pet = await checkPetOwner(req, res, id);
+        
         if(!pet) {
-            res.status(404).json({message: "Pet não encontrado"});
-            return;
-        };
-
-        if(pet.user.id.toString() !== user.id) {
-            res.status(422).json({message: "Houve um problema em processar a sua solicitação, tente novament mais tarde"});
             return;
         };
 
@@ -221,6 +193,71 @@ module.exports = class petController {
 
         res.status(200).json({
             message: "Pet atualizado com sucesso!"
+        });
+    };
+
+    static async schedule(req, res) {
+        const id = req.params.id;
+
+        if(!ObjectId.isValid(id)) {
+            res.status(422).json({message: "Id inválido"});
+            return;
+        };
+
+        const pet = await Pet.findOne({_id: id});
+
+        if(!pet) {
+            res.status(404).json({message: "Pet não encontrado"});
+            return;
+        };
+
+        const token = getToken(req);
+        const user = await getUserByToken(token);
+
+        if(pet.user.id.toString() === user.id) {
+            res.status(422).json({message: "Você não pode agendar uma visita para seu proprio pet"});
+            return;
+        };
+
+        if(pet.adopter) {
+            if(pet.adopter._id === user.id) {
+                res.status(422).json({message: "Você já agendou uma visita para este pet"});
+                return;
+            }
+        };
+
+        
+        pet.adopter = {
+            _id: user.id,
+            name: user.name,
+            image: user.image
+        };
+
+        await Pet.findByIdAndUpdate(id, pet);
+
+        res.status(200).json({
+            message: `A visita foi agendada com sucesso com ${pet.user.name} pelo telefone ${pet.user.phone}`,
+        })
+    };
+
+    static async concludeAdoption(req, res) {
+        const id = req.params.id;
+        const pet = await checkPetOwner(req, res, id);
+
+        if(!pet.adopter) {
+            res.status(422).json({
+                message:"O seu pet ainda não foi selecionado por outro usuário"
+            });
+            return;
+        };
+        
+
+        pet.available = false;
+
+        await Pet.findByIdAndUpdate(id, pet);
+
+        res.status(200).json({
+            message: "Parabéns seu pet foi adotado"
         });
     };
 };
