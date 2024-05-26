@@ -148,4 +148,79 @@ module.exports = class petController {
 
 
     };
+
+    static async updatePet(req, res) {
+        const {name, age, weight, color, available} = req.body;
+        const images = req.files;
+        const id = req.params.id;
+
+        const updatedData = {};
+
+        if(!ObjectId.isValid(id)) {
+            res.status(422).json({message: "Id inválido"});
+            return;
+        };
+
+        //passar isso para um helper
+        const token = getToken(req);
+        const user = await getUserByToken(token);
+
+        const pet = await Pet.findOne({_id: id});
+
+        if(!pet) {
+            res.status(404).json({message: "Pet não encontrado"});
+            return;
+        };
+
+        if(pet.user.id.toString() !== user.id) {
+            res.status(422).json({message: "Houve um problema em processar a sua solicitação, tente novament mais tarde"});
+            return;
+        };
+
+        //validations 
+
+        if(!name) {
+            res.status(422).json({message: "O nome é obrigatorio"});
+            return;
+        } else {
+            updatedData.name = name;
+        };
+
+        if(!age) {
+            res.status(422).json({message: "A idade é obrigatoria"});
+            return;
+        } else {
+            updatedData.age = age;
+        };
+
+        if(!weight) {
+            res.status(422).json({message: "O peso é obrigatorio"});
+            return;
+        } else {
+            updatedData.weight = weight;
+        };
+
+        if(!color) {
+            res.status(422).json({message: "A cor é obrigatoria"});
+            return;
+        } else {
+            updatedData.color = color;
+        };
+
+        if(images.length === 0) {
+            res.status(422).json({message: "A foto é obrigatoria"});
+            return;
+        } else {
+            updatedData.images = [];
+            images.map((image) => {
+                updatedData.images.push(image.filename);
+            });
+        };
+
+        await Pet.findByIdAndUpdate(id, updatedData);
+
+        res.status(200).json({
+            message: "Pet atualizado com sucesso!"
+        });
+    };
 };
