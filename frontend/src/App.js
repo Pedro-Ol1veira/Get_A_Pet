@@ -1,4 +1,4 @@
-import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 //Components
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
@@ -8,6 +8,7 @@ import Home from './components/pages/Home';
 import Login from './components/pages/auth/Login';
 import Register from './components/pages/auth/Register';
 import Container from './components/layout/Container';
+import Message from './components/layout/Message';
 
 //context
 import { UserProvider } from './context/UserContext';
@@ -19,15 +20,16 @@ function App() {
   return (
     <Router>
       <UserProvider>
-        <Navbar/>
+        <Navbar />
+        <Message />
         <Container>
           <Routes>
-            <Route path='/' element={<Home/>}/>
-            <Route path='/login' element={<Login/>}/>
-            <Route path='/register' element={<Register/>}/> 
+            <Route path='/' element={<Home />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/register' element={<Register />} />
           </Routes>
         </Container>
-        <Footer/>
+        <Footer />
       </UserProvider>
     </Router>
   );
