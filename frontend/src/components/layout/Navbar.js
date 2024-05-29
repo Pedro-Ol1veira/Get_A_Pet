@@ -1,25 +1,39 @@
 import { Link } from "react-router-dom";
 import Logo from '../../assets/img/logo.png';
 import Styles from './Navbar.module.css';
+import { Context } from '../../context/UserContext';
+import { useContext } from "react";
 
 
 function Navbar() {
-    return(
+    const { authenticated, logout } = useContext(Context);
+    return (
         <nav className={Styles.navbar}>
             <div className={Styles.navbar_logo}>
-                <img src={Logo} alt="Get A Pet"/>
+                <img src={Logo} alt="Get A Pet" />
                 <h2>Get A Pet</h2>
             </div>
             <ul>
                 <li>
                     <Link to="/">Adotar</Link>
                 </li>
-                <li>
-                    <Link to="/login">Entrar</Link>
-                </li>
-                <li>
-                    <Link to="/register">Cadastrar</Link>
-                </li>
+                {authenticated ? (
+                    <>
+                        <li onClick={logout}>
+                            Sair
+                        </li>
+                    </>
+                ) : (
+                    <>
+                        <li>
+                            <Link to="/login">Entrar</Link>
+                        </li>
+                        <li>
+                            <Link to="/register">Cadastrar</Link>
+                        </li>
+                    </>
+                )
+                }
             </ul>
         </nav>
     );
