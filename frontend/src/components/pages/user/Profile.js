@@ -4,10 +4,12 @@ import formStyles from '../../form/Form.module.css';
 import Styles from './Profile.module.css';
 import Input from '../../form/Input';
 import useFlashMessage from '../../../hooks/useFlahsMessage';
+import RoundedImage from '../../layout/RoundedImage';
 
 
 function Profile() {
     const [user, setUser] = useState({});
+    const [preview, setPreview] = useState();
     const [token] = useState(localStorage.getItem('token') || '');
     const { setFlashMessage } = useFlashMessage();
 
@@ -22,6 +24,7 @@ function Profile() {
         })
     }, [token]);
     function onFileChange(e) {
+        setPreview(e.target.files[0] );
         setUser({ ...user, [e.target.name]: e.target.files[0] });
     };
 
@@ -56,7 +59,15 @@ function Profile() {
         <section>
             <div className={Styles.profile_header}>
                 <h1>Perfil</h1>
-                <p>Preview Imagem</p>
+                {(user.image || preview) && (
+                    <RoundedImage 
+                        src={
+                            preview ? URL.createObjectURL(preview) : 
+                            `${process.env.REACT_APP_API}/images/users/${user.image}`
+                        }
+                        alt={user.name}
+                    />
+                )}
             </div>
             <form onSubmit={handleSubmit} className={formStyles.form_container}>
                 <Input
