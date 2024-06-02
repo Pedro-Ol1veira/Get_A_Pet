@@ -23,6 +23,9 @@ function Navbar() {
                             <Link to="/pets/mypets">Meus Pets</Link>
                         </li>
                         <li>
+                            <Link to="/pets/myadoptions">Minhas Adoções</Link>
+                        </li>
+                        <li>
                             <Link to="/user/profile">Perfil</Link>
                         </li>
                         <li onClick={logout}>
