@@ -12,6 +12,6 @@ Frontend:<br/>
  ReactJs<br/>
 
 Abrir terminal na pasta do backend e rodar comando:<br/>
- npm start
+ npm start<br/>
 Abrir terminal na pasta do frontend e rodar comando:<br/>
  npm start
