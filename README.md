@@ -1,17 +1,17 @@
 # Get_A_Pet
 
-backend:
- NodeJs
- express
- bcrypt
- jsonwebtoken
- mongose / mongoDb
- multer
+backend:<br/>
+ NodeJs <br/>
+ express <br/>
+ bcrypt<br/>
+ jsonwebtoken<br/>
+ mongose / mongoDb<br/>
+ multer<br/>
 
-Frontend:
- ReactJs
+Frontend:<br/>
+ ReactJs<br/>
 
-Abrir terminal na pasta do backend e rodar comando:
+Abrir terminal na pasta do backend e rodar comando:<br/>
  npm start
-Abrir terminal na pasta do frontend e rodar comando:
+Abrir terminal na pasta do frontend e rodar comando:<br/>
  npm start
